@@ -14,18 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef QUICK_LINT_JS_PIPE_H
-#define QUICK_LINT_JS_PIPE_H
+#ifndef QUICK_LINT_JS_LSP_PIPE_WRITER_H
+#define QUICK_LINT_JS_LSP_PIPE_WRITER_H
 
+#include <quick-lint-js/char8.h>
 #include <quick-lint-js/file-handle.h>
 
 namespace quick_lint_js {
-struct pipe_fds {
-  platform_file reader;
-  platform_file writer;
-};
+// An lsp_pipe_writer sends server->client Language Server Protocol messages via
+// a pipe or socket.
+//
+// lsp_pipe_writer satisfies lsp_endpoint_remote.
+class lsp_pipe_writer {
+ public:
+  explicit lsp_pipe_writer(platform_file_ref pipe);
 
-pipe_fds make_pipe();
+  void send_message(string8_view);
+
+ private:
+  template <class T>
+  void write_integer(T);
+
+  void write(string8_view);
+
+  platform_file_ref pipe_;
+};
 }
 
 #endif
